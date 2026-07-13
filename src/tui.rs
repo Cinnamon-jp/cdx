@@ -1,6 +1,6 @@
 use crossterm::{
     cursor::{Hide, MoveTo, Show},
-    event::{self, Event, KeyCode, KeyModifiers},
+    event::{self, Event, KeyCode},
     execute, queue,
     style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
     terminal::{
@@ -179,7 +179,7 @@ pub fn path_finder() -> io::Result<Option<String>> {
                     path_input = String::new();
                     selected = 0;
                 }
-                KeyCode::Backspace => {
+                KeyCode::Backspace | KeyCode::BackTab => {
                     if path_input.is_empty() {
                         current_dir.pop();
 
@@ -191,17 +191,21 @@ pub fn path_finder() -> io::Result<Option<String>> {
                 }
                 KeyCode::Enter => {
                     let selected_element = &target_dirs[selected];
-                    let result_dir = if selected_element == "." {
-                        current_dir.clone()
+                    // . を選択したときだけ終了
+                    if selected_element == "." {
+                        let result_dir = current_dir.clone();
+
+                        execute!(stdout, Show, LeaveAlternateScreen)?;
+                        disable_raw_mode()?;
+                        return Ok(Some(result_dir.to_string_lossy().into_owned()));
                     } else if selected_element == ".." {
                         current_dir.pop();
-                        current_dir.clone()
                     } else {
-                        current_dir.join(selected_element)
+                        current_dir.push(selected_element);
                     };
-                    execute!(stdout, Show, LeaveAlternateScreen)?;
-                    disable_raw_mode()?;
-                    return Ok(Some(result_dir.to_string_lossy().into_owned()));
+
+                    // ディレクトリが移動したので一覧を再取得
+                    all_dirs = get_entries(&current_dir, EntryType::Dir)?;
                 }
                 // KeyCode::Left | KeyCode::Char('h') => {
                 //     if let Some(parent) = current_dir.parent() {
