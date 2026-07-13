@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Cinnamon-jp
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
 mod tui;
 
 use std::{env, path};

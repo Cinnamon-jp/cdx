@@ -85,4 +85,4 @@ You can use `cdx` in two ways (very simple!!):
 
 ## License
 
-[MIT License](LICENSE) (or specify your license here)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

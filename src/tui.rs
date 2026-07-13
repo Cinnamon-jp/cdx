@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Cinnamon-jp
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
 use crossterm::{
     cursor::{Hide, MoveTo, Show},
     event::{self, Event, KeyCode, KeyModifiers},
