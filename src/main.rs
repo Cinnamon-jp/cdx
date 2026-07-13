@@ -11,6 +11,7 @@ fn main() {
 
     let target_dir: path::PathBuf;
 
+    // 引数の有無でTUI表示を切り替え
     if args.len() == 1 {
         match tui::path_finder() {
             Ok(Some(dir)) => target_dir = path::PathBuf::from(dir),
@@ -24,16 +25,18 @@ fn main() {
         target_dir = path::PathBuf::from(&args[1]);
     }
 
+    // <<< エラー処理
     if !target_dir.exists() {
         eprintln!("Error: '{}' does not exist.", target_dir.display());
         std::process::exit(1);
     }
-
     if !target_dir.is_dir() {
         eprintln!("Error: '{}' is not a directory.", target_dir.display());
         std::process::exit(1);
     }
+    // >>> エラー処理
 
+    // 絶対パスに変換
     match target_dir.canonicalize() {
         Ok(abs_path) => println!("{}", abs_path.display()),
         Err(e) => {

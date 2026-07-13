@@ -1,6 +1,6 @@
 use crossterm::{
     cursor::{Hide, MoveTo, Show},
-    event::{self, Event, KeyCode},
+    event::{self, Event, KeyCode, KeyModifiers},
     execute, queue,
     style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
     terminal::{
@@ -97,10 +97,7 @@ pub fn path_finder() -> io::Result<Option<String>> {
         };
 
         // 描画終了インデックスを計算
-        let end_idx = std::cmp::min(
-            target_dirs.len(),
-            start_idx + list_rows
-        );
+        let end_idx = std::cmp::min(target_dirs.len(), start_idx + list_rows);
 
         // 描画キューに追加
         queue!(
@@ -114,8 +111,7 @@ pub fn path_finder() -> io::Result<Option<String>> {
         if target_dirs.is_empty() {
             queue!(stdout, Print("  (Empty)\r\n"))?;
         } else {
-            for i in start_idx..end_idx {
-                let dir = &target_dirs[i];
+            for (i, dir) in target_dirs.iter().enumerate().take(end_idx).skip(start_idx) {
                 if i == selected {
                     queue!(
                         stdout,
@@ -134,103 +130,98 @@ pub fn path_finder() -> io::Result<Option<String>> {
         stdout.flush()?;
 
         // キー入力を処理 (ブロックして待機)
-        match event::read()? {
-            Event::Key(key) => {
-                // リストが空の場合: Esc / 文字入力 / Backspace のみ処理
-                if target_dirs.is_empty() {
-                    match key.code {
-                        KeyCode::Esc => {
-                            execute!(stdout, Show, LeaveAlternateScreen)?;
-                            disable_raw_mode()?;
-                            return Ok(None);
-                        }
-                        KeyCode::Char(ch) => path_input.push(ch),
-                        KeyCode::Backspace => {
-                            if path_input.is_empty() {
-                                current_dir.pop();
-                                all_dirs = get_entries(&current_dir, EntryType::Dir)?;
-                            } else {
-                                path_input.pop();
-                            }
-                        }
-                        _ => {}
-                    }
-                    continue;
-                }
-
-                // ここ以降は target_dirs が非空であることが保証される
+        if let Event::Key(key) = event::read()? {
+            // リストが空の場合: Esc / 文字入力 / Backspace のみ処理
+            if target_dirs.is_empty() {
                 match key.code {
                     KeyCode::Esc => {
                         execute!(stdout, Show, LeaveAlternateScreen)?;
                         disable_raw_mode()?;
                         return Ok(None);
                     }
-                    KeyCode::Up => selected = selected.saturating_sub(1),
-                    KeyCode::Down => {
-                        selected = selected.saturating_add(1).min(target_dirs.len() - 1)
-                    }
-                    KeyCode::Tab => {
-                        let selected_element = &target_dirs[selected];
-
-                        if selected_element == "." {
-                        } else if selected_element == ".." {
-                            current_dir.pop();
-                        } else {
-                            current_dir.push(selected_element);
-                        }
-
-                        // ディレクトリが移動したので一覧を再取得
-                        all_dirs = get_entries(&current_dir, EntryType::Dir)?;
-
-                        // 各種パラメータ初期化
-                        path_input = String::new();
-                        selected = 0;
-                    }
+                    KeyCode::Char(ch) => path_input.push(ch),
                     KeyCode::Backspace => {
                         if path_input.is_empty() {
                             current_dir.pop();
-
-                            // ディレクトリが移動したので一覧を再取得
                             all_dirs = get_entries(&current_dir, EntryType::Dir)?;
                         } else {
                             path_input.pop();
                         }
                     }
-                    KeyCode::Enter => {
-                        let selected_element = &target_dirs[selected];
-                        let result_dir = if selected_element == "." {
-                            current_dir.clone()
-                        } else if selected_element == ".." {
-                            current_dir.pop();
-                            current_dir.clone()
-                        } else {
-                            current_dir.join(selected_element)
-                        };
-                        execute!(stdout, Show, LeaveAlternateScreen)?;
-                        disable_raw_mode()?;
-                        return Ok(Some(result_dir.to_string_lossy().into_owned()));
-                    }
-                    // KeyCode::Left | KeyCode::Char('h') => {
-                    //     if let Some(parent) = current_dir.parent() {
-                    //         current_dir = parent.to_path_buf();
-                    //         target_dirs = get_entries(&current_dir, EntryType::Dir)?;
-                    //         selected = 0;
-                    //     }
-                    // }
-                    // KeyCode::Right | KeyCode::Char('l') => {
-                    //     if !target_dirs.is_empty() {
-                    //         current_dir.push(&target_dirs[selected]);
-                    //         target_dirs = get_entries(&current_dir, EntryType::Dir)?;
-                    //         selected = 0;
-                    //     }
-                    // }
-                    KeyCode::Char(ch) => {
-                        path_input.push(ch);
-                    }
                     _ => {}
                 }
+                continue;
             }
-            _ => {}
+
+            // ここ以降は target_dirs が非空であることが保証される
+            match key.code {
+                KeyCode::Esc => {
+                    execute!(stdout, Show, LeaveAlternateScreen)?;
+                    disable_raw_mode()?;
+                    return Ok(None);
+                }
+                KeyCode::Up => selected = selected.saturating_sub(1),
+                KeyCode::Down => selected = selected.saturating_add(1).min(target_dirs.len() - 1),
+                KeyCode::Tab => {
+                    let selected_element = &target_dirs[selected];
+
+                    if selected_element == "." {
+                    } else if selected_element == ".." {
+                        current_dir.pop();
+                    } else {
+                        current_dir.push(selected_element);
+                    }
+
+                    // ディレクトリが移動したので一覧を再取得
+                    all_dirs = get_entries(&current_dir, EntryType::Dir)?;
+
+                    // 各種パラメータ初期化
+                    path_input = String::new();
+                    selected = 0;
+                }
+                KeyCode::Backspace => {
+                    if path_input.is_empty() {
+                        current_dir.pop();
+
+                        // ディレクトリが移動したので一覧を再取得
+                        all_dirs = get_entries(&current_dir, EntryType::Dir)?;
+                    } else {
+                        path_input.pop();
+                    }
+                }
+                KeyCode::Enter => {
+                    let selected_element = &target_dirs[selected];
+                    let result_dir = if selected_element == "." {
+                        current_dir.clone()
+                    } else if selected_element == ".." {
+                        current_dir.pop();
+                        current_dir.clone()
+                    } else {
+                        current_dir.join(selected_element)
+                    };
+                    execute!(stdout, Show, LeaveAlternateScreen)?;
+                    disable_raw_mode()?;
+                    return Ok(Some(result_dir.to_string_lossy().into_owned()));
+                }
+                // KeyCode::Left | KeyCode::Char('h') => {
+                //     if let Some(parent) = current_dir.parent() {
+                //         current_dir = parent.to_path_buf();
+                //         target_dirs = get_entries(&current_dir, EntryType::Dir)?;
+                //         selected = 0;
+                //     }
+                // }
+                // KeyCode::Right | KeyCode::Char('l') => {
+                //     if !target_dirs.is_empty() {
+                //         current_dir.push(&target_dirs[selected]);
+                //         target_dirs = get_entries(&current_dir, EntryType::Dir)?;
+                //         selected = 0;
+                //     }
+                // }
+                KeyCode::Char(ch) => {
+                    path_input.push(ch);
+                }
+                _ => {}
+            }
         }
     }
 }
