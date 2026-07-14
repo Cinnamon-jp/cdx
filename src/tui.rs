@@ -57,20 +57,20 @@ fn get_entries(dir: &Path, target: EntryType) -> io::Result<Vec<String>> {
 // 公開関数: ターミナルの初期化と復帰を保証するラッパー
 pub fn path_finder() -> io::Result<Option<String>> {
     enable_raw_mode()?;
-    let mut stdout = io::stdout();
-    execute!(stdout, EnterAlternateScreen, Hide)?;
+    let mut stderr = io::stderr();
+    execute!(stderr, EnterAlternateScreen, Hide)?;
 
-    let result = path_finder_inner(&mut stdout);
+    let result = path_finder_inner(&mut stderr);
 
     // result が Ok でも Err でも必ず復帰処理を実行
-    execute!(stdout, Show, LeaveAlternateScreen)?;
+    execute!(stderr, Show, LeaveAlternateScreen)?;
     disable_raw_mode()?;
 
     result
 }
 
 // 内部ロジック: エラー時は ? で即座に返しても安全
-fn path_finder_inner(stdout: &mut io::Stdout) -> io::Result<Option<String>> {
+fn path_finder_inner(stderr: &mut io::Stderr) -> io::Result<Option<String>> {
     // 情報保持変数
     let mut current_dir = std::env::current_dir()?;
     let mut selected: usize = 0; // 選択しているインデックス
@@ -116,7 +116,7 @@ fn path_finder_inner(stdout: &mut io::Stdout) -> io::Result<Option<String>> {
 
         // 描画キューに追加
         queue!(
-            stdout,
+            stderr,
             Clear(ClearType::All),
             MoveTo(0, 0),
             Print(format!("{}{}{}\r\n", display_path, separator, path_input)),
@@ -124,25 +124,25 @@ fn path_finder_inner(stdout: &mut io::Stdout) -> io::Result<Option<String>> {
 
         // ディレクトリの描画
         if target_dirs.is_empty() {
-            queue!(stdout, Print("  (Empty)\r\n"))?;
+            queue!(stderr, Print("  (Empty)\r\n"))?;
         } else {
             for (i, dir) in target_dirs.iter().enumerate().take(end_idx).skip(start_idx) {
                 if i == selected {
                     queue!(
-                        stdout,
+                        stderr,
                         SetForegroundColor(Color::Cyan),
                         SetBackgroundColor(Color::DarkGrey),
                         Print(format!("{}\r\n", dir)),
                         ResetColor,
                     )?;
                 } else {
-                    queue!(stdout, Print(format!("{}\r\n", dir)))?;
+                    queue!(stderr, Print(format!("{}\r\n", dir)))?;
                 }
             }
         }
 
         // キューを実行
-        stdout.flush()?;
+        stderr.flush()?;
 
         // キー入力を処理 (ブロックして待機)
         match event::read()? {
