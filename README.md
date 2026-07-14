@@ -34,6 +34,8 @@ Because `cdx` runs as a child process, it cannot directly change the working dir
 
 To make it work as a seamless `cd` replacement, add a wrapper function to your shell configuration file.
 
+> **Note:** Ensure that the cargo installation directory (typically `~/.cargo/bin`) is included in your system's `$PATH`. Otherwise, the shell wrapper will not be able to find the `cdx` binary.
+
 ### Bash / Zsh
 Add the following to your `~/.bashrc` or `~/.zshrc`:
 ```bash
