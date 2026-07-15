@@ -78,6 +78,7 @@ You can use `cdx` in two ways (very simple!!):
 
 ## Planned Features
 
+- **Case-Insensitive Search**: Search without distinguishing between uppercase and lowercase letters.
 - **TOML Configuration**: Customize colors, keybindings, and behavior via a configuration file.
 - **Easy Installation**: Distribute pre-compiled binaries via package managers like Homebrew.
 - **Auto Shell Integration**: Provide a setup command to automatically configure shell wrappers.
