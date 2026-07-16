@@ -77,9 +77,26 @@ You can use `cdx` in two ways (very simple!!):
 | `Backspace` | Delete the last typed character in the search. If search is empty, go up to the parent directory. |
 | `Esc` / `Ctrl-C` | Cancel and exit without changing the directory. |
 
+### TOML Configuration
+You can create `config.toml` in `~/.config/cdx/` to configure **cdx**.
+```toml
+[ui]
+selected_background_color = "<color>"
+selected_foreground_color = "<color>"
+selected_border = "none | line | dotted"
+path_foreground_color
+
+[system]
+use_case_insensitive_search = true | false
+```
+- `<color>`: `black` | `gray` | `white` | `red` | `green` | `yellow` | `blue` | `magenta` | `cyan`  
+&ensp;&ensp;&ensp;&ensp;Add the `dark` prefix to `<color>` if you want a darker color (e.g., `dark red`).  
+&ensp;&ensp;&ensp;&ensp;(`dark black` does not exist. `dark gray` and `dark white` are the same as `black` and `gray`, respectively.)
 ## Planned Features
 
 - **TOML Configuration**: Customize colors, keybindings, and behavior via a configuration file.
+- **Cyclic Navigation**: Support wrap-around selection in the entry list (moving up past the top item jumps to the bottom, and vice versa).
+- **Colorize Entries List**: Use distinct colors for directories, symbolic links, hidden entries, and other entry types to make the list easier to scan.
 - **Easy Installation**: Distribute pre-compiled binaries via package managers like Homebrew.
 - **Auto Shell Integration**: Provide a setup command to automatically configure shell wrappers.
 - **Hidden & Gitignore Support**: Add toggles for hidden directories and respect `.gitignore` rules.
