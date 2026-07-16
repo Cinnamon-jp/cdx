@@ -87,7 +87,10 @@ fn path_finder_inner(stderr: &mut io::Stderr) -> io::Result<Option<String>> {
         // ディレクトリ内を検索
         let target_dirs: Vec<String> = all_dirs
             .iter()
-            .filter(|s| s.starts_with(&path_input))
+            .filter(|s| {
+                s.to_lowercase()
+                    .starts_with(&path_input.to_lowercase())
+            })
             .cloned()
             .collect();
 

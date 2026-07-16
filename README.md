@@ -7,6 +7,7 @@
 - **Interactive TUI**: Navigate through directories with an intuitive terminal interface.
 - **Non-Interactive Mode**: Supports standard `cd`-like usage with arguments for a seamless transition.
 - **Incremental Search**: Quickly filter directories with minimal typing.
+- **Case-Insensitive Search**: Search without distinguishing between uppercase and lowercase letters.
 - **Keyboard-Driven**: Use standard navigation keys for fast and seamless movement.
 - **Cross-Platform**: Built with `crossterm`, ensuring smooth execution on various platforms.
 
@@ -78,7 +79,6 @@ You can use `cdx` in two ways (very simple!!):
 
 ## Planned Features
 
-- **Case-Insensitive Search**: Search without distinguishing between uppercase and lowercase letters.
 - **TOML Configuration**: Customize colors, keybindings, and behavior via a configuration file.
 - **Easy Installation**: Distribute pre-compiled binaries via package managers like Homebrew.
 - **Auto Shell Integration**: Provide a setup command to automatically configure shell wrappers.
