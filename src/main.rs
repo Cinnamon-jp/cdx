@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+mod model;
 mod tui;
 
 use std::{env, path};
