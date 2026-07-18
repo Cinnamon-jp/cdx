@@ -24,9 +24,6 @@ pub struct UiConfig {
     pub selected_background_color: Color,
     #[serde(with = "color_serde")]
     pub selected_foreground_color: Color,
-    pub selected_border: String,
-    #[serde(with = "color_serde")]
-    pub selected_border_color: Color,
     #[serde(with = "color_serde")]
     pub path_foreground_color: Color,
 }
@@ -42,8 +39,6 @@ impl Default for UiConfig {
         Self {
             selected_background_color: Color::DarkGrey,
             selected_foreground_color: Color::Cyan,
-            selected_border: "none".to_string(),
-            selected_border_color: Color::Black,
             path_foreground_color: Color::Cyan,
         }
     }
@@ -203,7 +198,6 @@ mod tests {
 [ui]
 selected_background_color = "red"
 selected_foreground_color = "black"
-selected_border = "line"
 path_foreground_color = "magenta"
 
 [system]
@@ -216,7 +210,6 @@ use_case_insensitive_search = false
 
         assert_eq!(config.ui.selected_background_color, Color::Red);
         assert_eq!(config.ui.selected_foreground_color, Color::Black);
-        assert_eq!(config.ui.selected_border, "line");
         assert_eq!(config.ui.path_foreground_color, Color::Magenta);
         assert!(!config.system.use_case_insensitive_search);
 

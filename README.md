@@ -83,8 +83,7 @@ You can create `config.toml` in `~/.config/cdx/` to configure **cdx**.
 [ui]
 selected_background_color = "<color>"
 selected_foreground_color = "<color>"
-selected_border = "none | line | dotted"
-path_foreground_color
+path_foreground_color = "<color>"
 
 [system]
 use_case_insensitive_search = true | false
@@ -97,6 +96,7 @@ use_case_insensitive_search = true | false
 - **TOML Configuration**: Customize colors, keybindings, and behavior via a configuration file.
 - **Cyclic Navigation**: Support wrap-around selection in the entry list (moving up past the top item jumps to the bottom, and vice versa).
 - **Colorize Entries List**: Use distinct colors for directories, symbolic links, hidden entries, and other entry types to make the list easier to scan.
+- **Partial Path Navigation**: When `cdx <path>` is executed with a partially invalid path, navigate to the deepest valid directory and launch interactive mode.
 - **Easy Installation**: Distribute pre-compiled binaries via package managers like Homebrew.
 - **Auto Shell Integration**: Provide a setup command to automatically configure shell wrappers.
 - **Hidden & Gitignore Support**: Add toggles for hidden directories and respect `.gitignore` rules.
