@@ -91,7 +91,7 @@ use_case_insensitive_search = true | false
 ```
 - `<color>`: `black` | `gray` | `white` | `red` | `green` | `yellow` | `blue` | `magenta` | `cyan`  
 &ensp;&ensp;&ensp;&ensp;Add the `dark` prefix to `<color>` if you want a darker color (e.g., `dark red`).  
-&ensp;&ensp;&ensp;&ensp;(`dark black` does not exist. `dark gray` and `dark white` are the same as `black` and `gray`, respectively.)
+&ensp;&ensp;&ensp;&ensp;(`dark black` does not exist. `dark white` is the same as `gray`, respectively.)
 ## Planned Features
 
 - **TOML Configuration**: Customize colors, keybindings, and behavior via a configuration file.

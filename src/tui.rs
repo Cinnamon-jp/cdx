@@ -12,13 +12,30 @@ use crossterm::{
         enable_raw_mode,
     },
 };
-use std::fs;
 use std::io::{self, Write};
 use std::path::Path;
+use std::{fs, path::PathBuf};
+
+use crate::io_config;
 
 enum EntryType {
     Dir,
     // File,
+}
+
+// 公開関数: ターミナルの初期化と復帰を保証するラッパー
+pub fn path_finder() -> io::Result<Option<String>> {
+    enable_raw_mode()?;
+    let mut stderr = io::stderr();
+    execute!(stderr, EnterAlternateScreen, Hide)?;
+
+    let result = path_finder_inner(&mut stderr);
+
+    // result が Ok でも Err でも必ず復帰処理を実行
+    execute!(stderr, Show, LeaveAlternateScreen)?;
+    disable_raw_mode()?;
+
+    result
 }
 
 // ディレクトリ下のファイル・ディレクトリのリストを取得する関数
@@ -54,23 +71,11 @@ fn get_entries(dir: &Path, target: EntryType) -> io::Result<Vec<String>> {
     Ok(items)
 }
 
-// 公開関数: ターミナルの初期化と復帰を保証するラッパー
-pub fn path_finder() -> io::Result<Option<String>> {
-    enable_raw_mode()?;
-    let mut stderr = io::stderr();
-    execute!(stderr, EnterAlternateScreen, Hide)?;
-
-    let result = path_finder_inner(&mut stderr);
-
-    // result が Ok でも Err でも必ず復帰処理を実行
-    execute!(stderr, Show, LeaveAlternateScreen)?;
-    disable_raw_mode()?;
-
-    result
-}
-
 // 内部ロジック: エラー時は ? で即座に返しても安全
 fn path_finder_inner(stderr: &mut io::Stderr) -> io::Result<Option<String>> {
+    // 設定取得
+    let config = io_config::get_config_toml_or_default(PathBuf::from("cdx"));
+
     // 情報保持変数
     let mut current_dir = std::env::current_dir()?;
     let mut selected: usize = 0; // 選択しているインデックス

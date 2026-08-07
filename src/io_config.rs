@@ -11,7 +11,8 @@ use crate::model::Config;
 
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-pub fn get_config_toml(proj_path: PathBuf) -> Result<Config> {
+// proj_path にはツール名を入れる
+pub fn get_config_toml_or_default(proj_path: PathBuf) -> Result<Config> {
     let proj_str = proj_path
         .to_str()
         .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "Invalid project path"))?;
@@ -25,10 +26,7 @@ pub fn get_config_toml(proj_path: PathBuf) -> Result<Config> {
     let config_path = config_dir.join("config.toml");
 
     if !config_path.exists() {
-        return Err(Box::new(io::Error::new(
-            io::ErrorKind::NotFound,
-            format!("Config file not found at {}", config_path.display()),
-        )));
+        return Ok(Config::default());
     }
 
     parse_toml(config_path)
@@ -57,6 +55,8 @@ mod tests {
 
     #[test]
     fn test_parse_toml_valid() -> Result<()> {
+        use crossterm::style::Color;
+
         let path = temp_file_path("valid");
         let toml_content = r#"
 [ui]
@@ -73,11 +73,38 @@ use_case_insensitive_search = false
         let config = parse_toml(path.clone())?;
         let _ = fs::remove_file(path);
 
-        assert_eq!(config.ui.selected_background_color, "red");
-        assert_eq!(config.ui.selected_foreground_color, "black");
+        assert_eq!(config.ui.selected_background_color, Color::Red);
+        assert_eq!(config.ui.selected_foreground_color, Color::Black);
         assert_eq!(config.ui.selected_border, "line");
-        assert_eq!(config.ui.path_foreground_color, "magenta");
+        assert_eq!(config.ui.path_foreground_color, Color::Magenta);
         assert!(!config.system.use_case_insensitive_search);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_parse_toml_hex_color() -> Result<()> {
+        use crossterm::style::Color;
+
+        let path = temp_file_path("hex_color");
+        let toml_content = r##"
+[ui]
+selected_background_color = "#ff0000"
+selected_foreground_color = "#00ff00"
+"##;
+        fs::write(&path, toml_content)?;
+
+        let config = parse_toml(path.clone())?;
+        let _ = fs::remove_file(path);
+
+        assert_eq!(
+            config.ui.selected_background_color,
+            Color::Rgb { r: 255, g: 0, b: 0 }
+        );
+        assert_eq!(
+            config.ui.selected_foreground_color,
+            Color::Rgb { r: 0, g: 255, b: 0 }
+        );
 
         Ok(())
     }

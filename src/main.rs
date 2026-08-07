@@ -2,7 +2,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-mod io;
+mod io_config;
 mod model;
 mod tui;
 
