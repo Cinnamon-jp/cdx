@@ -19,8 +19,8 @@ fn main() {
 
     // 引数の有無でTUI表示を切り替え
     if args.len() == 1 {
-        match tui::path_finder() {
-            Ok(Some(dir)) => target_dir = path::PathBuf::from(dir),
+        match tui::path_finder(tui::EntryType::Dir) {
+            Ok(Some(dir)) => target_dir = dir,
             Ok(None) => std::process::exit(0),
             Err(e) => {
                 eprintln!("TUI Error: {}", e);
