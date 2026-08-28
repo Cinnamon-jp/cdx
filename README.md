@@ -73,7 +73,7 @@ You can use `cdx` in two ways (very simple!!):
 | --- | --- |
 | `Up` / `Down` | Move selection up or down. |
 | `Tab` | Enter the selected directory (or go up if `..` is selected). |
-| `Enter` | If `.` is selected, confirm and exit, changing to the current directory. Otherwise, enter the selected directory. |
+| `Enter` | Confirm and change to the selected directory (or parent/current directory if `..` / `.` is selected). |
 | `Backspace` | Delete the last typed character in the search. If search is empty, go up to the parent directory. |
 | `Esc` / `Ctrl-C` | Cancel and exit without changing the directory. |
 

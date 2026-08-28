@@ -2,9 +2,11 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-mod io_config;
-mod model;
+mod app;
+mod config;
+mod fs;
 mod tui;
+mod ui;
 
 use std::{env, path};
 
@@ -17,9 +19,10 @@ fn main() {
 
     let target_dir: path::PathBuf;
 
-    // 引数の有無でTUI表示を切り替え
+    // 引数に応じてTUIモードとダイレクトモードを切り替え
     if args.len() == 1 {
-        match tui::path_finder(tui::EntryType::Dir) {
+        let config = config::load_config_or_default();
+        match tui::path_finder(fs::EntryType::Dir, config) {
             Ok(Some(dir)) => target_dir = dir,
             Ok(None) => std::process::exit(0),
             Err(e) => {
@@ -31,7 +34,7 @@ fn main() {
         target_dir = path::PathBuf::from(&args[1]);
     }
 
-    // <<< エラー処理
+    // <<< エラーハンドリング
     if !target_dir.exists() {
         eprintln!("Error: '{}' does not exist.", target_dir.display());
         std::process::exit(1);
@@ -40,7 +43,7 @@ fn main() {
         eprintln!("Error: '{}' is not a directory.", target_dir.display());
         std::process::exit(1);
     }
-    // >>> エラー処理
+    // >>> エラーハンドリング
 
     // 絶対パスに変換
     match target_dir.canonicalize() {

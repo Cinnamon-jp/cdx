@@ -3,9 +3,14 @@
 // https://opensource.org/licenses/MIT
 
 use crossterm::style::Color;
+use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::PathBuf;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(default)]
 pub struct Config {
     pub ui: UiConfig,
@@ -32,20 +37,11 @@ pub struct SystemConfig {
     pub use_case_insensitive_search: bool,
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            ui: UiConfig::default(),
-            system: SystemConfig::default(),
-        }
-    }
-}
-
 impl Default for UiConfig {
     fn default() -> Self {
         Self {
-            selected_background_color: Color::Blue,
-            selected_foreground_color: Color::White,
+            selected_background_color: Color::DarkGrey,
+            selected_foreground_color: Color::Cyan,
             selected_border: "none".to_string(),
             selected_border_color: Color::Black,
             path_foreground_color: Color::Cyan,
@@ -59,6 +55,26 @@ impl Default for SystemConfig {
             use_case_insensitive_search: true,
         }
     }
+}
+
+/// 設定ファイル (~/.config/cdx/config.toml) を読み込み、存在しない場合やエラー時はデフォルト設定を返す
+pub fn load_config_or_default() -> Config {
+    get_config_path()
+        .and_then(|path| parse_toml(&path).ok())
+        .unwrap_or_default()
+}
+
+/// 設定ファイルのパスを取得
+pub fn get_config_path() -> Option<PathBuf> {
+    let proj_dirs = ProjectDirs::from("", "", "cdx")?;
+    Some(proj_dirs.config_dir().join("config.toml"))
+}
+
+/// 指定したパスのTOMLをパース
+pub fn parse_toml(path: &PathBuf) -> Result<Config> {
+    let content = fs::read_to_string(path)?;
+    let config: Config = toml::from_str(&content)?;
+    Ok(config)
 }
 
 pub fn parse_color_str(s: &str) -> Option<Color> {
@@ -80,7 +96,6 @@ pub fn parse_color_str(s: &str) -> Option<Color> {
         "dark blue" => Some(Color::DarkBlue),
         "dark magenta" => Some(Color::DarkMagenta),
         "dark cyan" => Some(Color::DarkCyan),
-        // "reset" => Color::Reset,
         _ => parse_hex_color(&s_clean),
     }
 }
@@ -148,6 +163,17 @@ pub mod color_serde {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    // 競合しない一時ファイルのパスを作成
+    fn temp_file_path(name: &str) -> PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        std::env::temp_dir().join(format!("cdx_test_{}_{}.toml", name, nanos))
+    }
 
     #[test]
     fn test_parse_color_str_named() {
@@ -163,10 +189,77 @@ mod tests {
             parse_color_str("#ff0000"),
             Some(Color::Rgb { r: 255, g: 0, b: 0 })
         );
-        assert_eq!(parse_color_str("3b82f6"), None); // '#' が無いため None
+        assert_eq!(parse_color_str("3b82f6"), None); // '#' がないため None
         assert_eq!(
             parse_color_str("#f00"),
             Some(Color::Rgb { r: 255, g: 0, b: 0 })
         );
+    }
+
+    #[test]
+    fn test_parse_toml_valid() -> Result<()> {
+        let path = temp_file_path("valid");
+        let toml_content = r#"
+[ui]
+selected_background_color = "red"
+selected_foreground_color = "black"
+selected_border = "line"
+path_foreground_color = "magenta"
+
+[system]
+use_case_insensitive_search = false
+"#;
+        fs::write(&path, toml_content)?;
+
+        let config = parse_toml(&path)?;
+        let _ = fs::remove_file(path);
+
+        assert_eq!(config.ui.selected_background_color, Color::Red);
+        assert_eq!(config.ui.selected_foreground_color, Color::Black);
+        assert_eq!(config.ui.selected_border, "line");
+        assert_eq!(config.ui.path_foreground_color, Color::Magenta);
+        assert!(!config.system.use_case_insensitive_search);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_parse_toml_hex_color() -> Result<()> {
+        let path = temp_file_path("hex_color");
+        let toml_content = r##"
+[ui]
+selected_background_color = "#ff0000"
+selected_foreground_color = "#00ff00"
+"##;
+        fs::write(&path, toml_content)?;
+
+        let config = parse_toml(&path)?;
+        let _ = fs::remove_file(path);
+
+        assert_eq!(
+            config.ui.selected_background_color,
+            Color::Rgb { r: 255, g: 0, b: 0 }
+        );
+        assert_eq!(
+            config.ui.selected_foreground_color,
+            Color::Rgb { r: 0, g: 255, b: 0 }
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_parse_toml_defaults() -> Result<()> {
+        let path = temp_file_path("defaults");
+        let toml_content = r#""#;
+        fs::write(&path, toml_content)?;
+
+        let config = parse_toml(&path)?;
+        let _ = fs::remove_file(path);
+
+        let default_config = Config::default();
+        assert_eq!(config, default_config);
+
+        Ok(())
     }
 }
