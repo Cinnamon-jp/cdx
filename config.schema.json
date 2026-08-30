@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "cdx Configuration Schema",
+  "description": "Schema for cdx configuration file (~/.config/cdx/config.toml)",
+  "type": "object",
+  "properties": {
+    "ui": {
+      "type": "object",
+      "description": "UI and appearance configuration",
+      "properties": {
+        "selected_background_color": {
+          "$ref": "#/$defs/color",
+          "description": "Background color of the selected entry",
+          "default": "dark gray"
+        },
+        "selected_foreground_color": {
+          "$ref": "#/$defs/color",
+          "description": "Foreground (text) color of the selected entry",
+          "default": "cyan"
+        },
+        "path_foreground_color": {
+          "$ref": "#/$defs/color",
+          "description": "Foreground (text) color of the current path and search query",
+          "default": "cyan"
+        }
+      },
+      "additionalProperties": false
+    },
+    "system": {
+      "type": "object",
+      "description": "System and behavior configuration",
+      "properties": {
+        "use_case_insensitive_search": {
+          "type": "boolean",
+          "description": "Whether to perform case-insensitive incremental search",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "color": {
+      "type": "string",
+      "description": "Color name or Hex code (#RGB or #RRGGBB)",
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "black",
+            "gray",
+            "dark white",
+            "white",
+            "red",
+            "green",
+            "yellow",
+            "blue",
+            "magenta",
+            "cyan",
+            "dark gray",
+            "dark red",
+            "dark green",
+            "dark yellow",
+            "dark blue",
+            "dark magenta",
+            "dark cyan"
+          ]
+        },
+        {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$"
+        }
+      ]
+    }
+  }
+}
