@@ -1,5 +1,8 @@
 # cdx
 
+[![Crates.io](https://img.shields.io/crates/v/cdx-rs.svg)](https://crates.io/crates/cdx-rs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **cdx** (Accelerated cd) is a modern, simple and interactive `cd` command alternative for CLI lovers, written in Rust. It provides a fast and light TUI to incrementally search and navigate directories with ease.
 
 ## Features
@@ -13,20 +16,34 @@
 
 ## Installation
 
-Ensure you have Rust and Cargo installed. Then, you can build and install `cdx` from source:
+Ensure you have Rust and Cargo installed. Then, install `cdx` via [crates.io](https://crates.io/crates/cdx-rs):
 
+```bash
+cargo install cdx-rs
+```
+
+<details>
+<summary>Other Installation Methods</summary>
+
+**From GitHub repository:**
+```bash
+cargo install --git https://github.com/Cinnamon-jp/cdx.git
+```
+
+**From local source:**
 ```bash
 git clone https://github.com/Cinnamon-jp/cdx.git
 cd cdx
 cargo install --path .
 ```
+</details>
 
 ### Uninstallation
 
 To remove `cdx`, run:
 
 ```bash
-cargo uninstall cdx
+cargo uninstall cdx-rs
 ```
 
 ## Shell Integration
