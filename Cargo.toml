@@ -1,9 +1,13 @@
 [package]
 name = "cdx"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2024"
 license = "MIT"
-
+description = "A fast and interactive cd command alternative for directory navigation"
+repository = "https://github.com/Cinnamon-jp/cdx"
+readme = "README.md"
+keywords = ["cd", "cli", "tui", "navigation", "directory"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 crossterm = "0.29.0"
