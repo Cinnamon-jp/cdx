@@ -50,14 +50,40 @@ cargo uninstall cdx-rs
 
 Because `cdx` runs as a child process, it cannot directly change the working directory of your current shell. Instead, it prints the selected directory's absolute path to the standard output. 
 
-To make it work as a seamless `cd` replacement, add a wrapper function to your shell configuration file.
+To make it work as a seamless `cd` replacement, add the initialization command to your shell configuration file.
 
-> **Note:** Ensure that the cargo installation directory (typically `~/.cargo/bin`) is included in your system's `$PATH`. Otherwise, the shell wrapper will not be able to find the `cdx` binary.
+> **Note:** Ensure that the cargo installation directory (typically `~/.cargo/bin`) is included in your system's `$PATH`. Otherwise, the shell will not be able to find the `cdx` binary.
 
-### Bash / Zsh
-Add the following to your `~/.bashrc` or `~/.zshrc`:
+### bash
+Add the following to your `~/.bashrc`:
+```bash
+eval "$(cdx init bash)"
+```
+
+### zsh
+Add the following to your `~/.zshrc`:
+```zsh
+eval "$(cdx init zsh)"
+```
+
+### fish
+Add the following to your `~/.config/fish/config.fish`:
+```fish
+cdx init fish | source
+```
+
+<details>
+<summary>Manual Configuration (without eval)</summary>
+
+If you prefer to define the wrapper function manually without `eval`:
+
+**bash / zsh:**
 ```bash
 function cdx() {
+    if [ "$1" = "init" ]; then
+        command cdx "$@"
+        return
+    fi
     local dest
     dest=$(command cdx "$@")
     if [ -n "$dest" ] && [ -d "$dest" ]; then
@@ -66,16 +92,20 @@ function cdx() {
 }
 ```
 
-### Fish
-Add the following to your `~/.config/fish/config.fish`:
+**fish:**
 ```fish
 function cdx
+    if test (count $argv) -gt 0 -a "$argv[1]" = "init"
+        command cdx $argv
+        return
+    end
     set dest (command cdx $argv)
     if test -n "$dest" -a -d "$dest"
         cd "$dest"
     end
 end
 ```
+</details>
 
 ## Usage
 
@@ -120,7 +150,6 @@ use_case_insensitive_search = true | false
 - **Colorize Entries List**: Use distinct colors for directories, symbolic links, hidden entries, and other entry types to make the list easier to scan.
 - **Partial Path Navigation**: When `cdx <path>` is executed with a partially invalid path, navigate to the deepest valid directory and launch interactive mode.
 - **Easy Installation**: Distribute pre-compiled binaries via package managers like Homebrew.
-- **Auto Shell Integration**: Provide a setup command to automatically configure shell wrappers.
 - **Hidden & Gitignore Support**: Add toggles for hidden directories and respect `.gitignore` rules.
 - **Vim Keybindings**: Support `h`/`j`/`k`/`l` navigation for power users.
 - **Directory Bookmarks**: Save and jump to your favorite directories instantly.
