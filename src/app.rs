@@ -62,15 +62,28 @@ impl App {
     }
 
     pub fn move_up(&mut self) {
-        self.selected = self.selected.saturating_sub(1);
+        if self.filtered_entries.is_empty() {
+            return;
+        }
+
+        self.selected = if self.selected == 0 {
+            self.filtered_entries.len().saturating_sub(1)
+        } else {
+            self.selected.saturating_sub(1)
+        }
     }
 
     pub fn move_down(&mut self) {
-        if !self.filtered_entries.is_empty() {
-            self.selected = self
-                .selected
+        if self.filtered_entries.is_empty() {
+            return;
+        }
+
+        self.selected = if self.selected == self.filtered_entries.len().saturating_sub(1) {
+            0
+        } else {
+            self.selected
                 .saturating_add(1)
-                .min(self.filtered_entries.len() - 1);
+                .min(self.filtered_entries.len() - 1)
         }
     }
 
