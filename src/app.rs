@@ -36,7 +36,7 @@ impl App {
 
     /// 入力文字列に基づいてエントリを絞り込み、選択インデックスを範囲内に収める
     pub fn update_filter(&mut self) {
-        let case_insensitive = self.config.system.use_case_insensitive_search;
+        let case_insensitive = self.config.system.case_insensitive_search;
         let search_query = if case_insensitive {
             self.input.to_lowercase()
         } else {
@@ -214,7 +214,7 @@ mod tests {
         fs::create_dir(dir.join("alpha_small"))?;
 
         let mut config = Config::default();
-        config.system.use_case_insensitive_search = false;
+        config.system.case_insensitive_search = false;
 
         let mut app = App::new(dir.clone(), EntryType::Dir, config)?;
         app.push_input('a');

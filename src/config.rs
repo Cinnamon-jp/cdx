@@ -31,7 +31,8 @@ pub struct UiConfig {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(default)]
 pub struct SystemConfig {
-    pub use_case_insensitive_search: bool,
+    pub case_insensitive_search: bool,
+    pub partial_navigation_fallback: bool,
 }
 
 impl Default for UiConfig {
@@ -47,7 +48,8 @@ impl Default for UiConfig {
 impl Default for SystemConfig {
     fn default() -> Self {
         Self {
-            use_case_insensitive_search: true,
+            case_insensitive_search: true,
+            partial_navigation_fallback: false,
         }
     }
 }
@@ -201,7 +203,8 @@ selected_foreground_color = "black"
 path_foreground_color = "magenta"
 
 [system]
-use_case_insensitive_search = false
+case_insensitive_search = false
+partial_navigation_fallback = false
 "#;
         fs::write(&path, toml_content)?;
 
@@ -211,7 +214,8 @@ use_case_insensitive_search = false
         assert_eq!(config.ui.selected_background_color, Color::Red);
         assert_eq!(config.ui.selected_foreground_color, Color::Black);
         assert_eq!(config.ui.path_foreground_color, Color::Magenta);
-        assert!(!config.system.use_case_insensitive_search);
+        assert!(!config.system.case_insensitive_search);
+        assert!(!config.system.partial_navigation_fallback);
 
         Ok(())
     }

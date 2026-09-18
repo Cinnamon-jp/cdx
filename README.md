@@ -134,7 +134,8 @@ selected_foreground_color = "<color>"
 path_foreground_color = "<color>"
 
 [system]
-use_case_insensitive_search = true | false
+case_insensitive_search = true|false
+partial_navigation_fallback = true|false
 ```
 
 - `<color>`:

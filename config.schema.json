@@ -30,7 +30,7 @@
       "type": "object",
       "description": "System and behavior configuration",
       "properties": {
-        "use_case_insensitive_search": {
+        "case_insensitive_search": {
           "type": "boolean",
           "description": "Whether to perform case-insensitive incremental search",
           "default": true
