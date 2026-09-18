@@ -39,11 +39,18 @@ fn main() {
     }
 
     let target_dir: path::PathBuf;
+    let config = config::load_config_or_default();
 
     // 引数に応じてTUIモードとダイレクトモードを切り替え
     if args.len() == 1 {
-        let config = config::load_config_or_default();
-        match tui::path_finder(fs::EntryType::Dir, config) {
+        let current_dir = match std::env::current_dir() {
+            Ok(dir) => dir,
+            Err(e) => {
+                eprintln!("Error getting current directory: {}", e);
+                std::process::exit(1);
+            }
+        };
+        match tui::path_finder(current_dir, fs::EntryType::Dir, config) {
             Ok(Some(dir)) => target_dir = dir,
             Ok(None) => std::process::exit(0),
             Err(e) => {
@@ -52,10 +59,39 @@ fn main() {
             }
         }
     } else {
-        target_dir = path::PathBuf::from(&args[1]);
+        if config.system.partial_navigation_fallback {
+            let arg_path = path::PathBuf::from(&args[1]);
+            if arg_path.is_dir() {
+                target_dir = arg_path;
+            } else {
+                let mut exist_path = arg_path.clone();
+
+                while !exist_path.exists() {
+                    if !exist_path.pop() {
+                        break;
+                    }
+                }
+            }
+            
+            // `exist_path.pop();` が一回でも実行された場合、tui::path_finderを起動する
+            if exist_path != arg_path {
+                match tui::path_finder(exist_path, fs::EntryType::Dir, config) {
+                    Ok(Some(dir)) => target_dir = dir,
+                    Ok(None) => std::process::exit(0),
+                    Err(e) => {
+                        eprintln!("TUI Error: {}", e);
+                        std::process::exit(1);
+                    }
+                }
+            } else {
+                target_dir = exist_path;
+            }
+        } else {
+            target_dir = path::PathBuf::from(&args[1]);
+        };
     }
 
-    // <<< エラーハンドリング
+    // <<< Error handling
     if !target_dir.exists() {
         eprintln!("Error: '{}' does not exist.", target_dir.display());
         if args.get(1).is_some_and(|s| s == "init") {
@@ -67,9 +103,9 @@ fn main() {
         eprintln!("Error: '{}' is not a directory.", target_dir.display());
         std::process::exit(1);
     }
-    // >>> エラーハンドリング
+    // >>> Error handling
 
-    // 絶対パスに変換
+    // Convert to absolute path
     match target_dir.canonicalize() {
         Ok(abs_path) => println!("{}", abs_path.display()),
         Err(e) => {

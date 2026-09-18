@@ -148,7 +148,6 @@ partial_navigation_fallback = true|false
 ## Planned Features
 
 - **Colorize Entries List**: Use distinct colors for directories, symbolic links, hidden entries, and other entry types to make the list easier to scan.
-- **Partial Path Navigation**: When `cdx <path>` is executed with a partially invalid path, navigate to the deepest valid directory and launch interactive mode.
 - **Easy Installation**: Distribute pre-compiled binaries via package managers like Homebrew.
 - **Hidden & Gitignore Support**: Add toggles for hidden directories and respect `.gitignore` rules.
 - **Vim Keybindings**: Support `h`/`j`/`k`/`l` navigation for power users.

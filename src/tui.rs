@@ -8,8 +8,8 @@ use crossterm::{
     execute,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use std::io;
 use std::path::PathBuf;
+use std::io;
 
 use crate::app::App;
 use crate::config::Config;
@@ -17,12 +17,16 @@ use crate::fs::EntryType;
 use crate::ui;
 
 // 公開関数: 端末の初期化と復元を保証するラッパー
-pub fn path_finder(entry_type: EntryType, config: Config) -> io::Result<Option<PathBuf>> {
+pub fn path_finder(
+    current_dir: PathBuf,
+    entry_type: EntryType,
+    config: Config,
+) -> io::Result<Option<PathBuf>> {
     enable_raw_mode()?;
     let mut stderr = io::stderr();
     execute!(stderr, EnterAlternateScreen, cursor::Hide)?;
 
-    let result = path_finder_inner(&mut stderr, entry_type, config);
+    let result = path_finder_inner(&mut stderr, current_dir, entry_type, config);
 
     // 処理結果に関わらず必ず端末の状態を復元
     execute!(stderr, cursor::Show, LeaveAlternateScreen)?;
@@ -34,10 +38,10 @@ pub fn path_finder(entry_type: EntryType, config: Config) -> io::Result<Option<P
 // 内部ロジック（イベントループと描画制御）
 fn path_finder_inner(
     stderr: &mut io::Stderr,
+    current_dir: PathBuf,
     entry_type: EntryType,
     config: Config,
 ) -> io::Result<Option<PathBuf>> {
-    let current_dir = std::env::current_dir()?;
     let mut app = App::new(current_dir, entry_type, config)?;
 
     loop {
