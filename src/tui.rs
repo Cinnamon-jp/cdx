@@ -8,8 +8,8 @@ use crossterm::{
     execute,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use std::path::PathBuf;
 use std::io;
+use std::path::PathBuf;
 
 use crate::app::App;
 use crate::config::Config;
