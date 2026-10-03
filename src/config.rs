@@ -259,4 +259,56 @@ selected_foreground_color = "#00ff00"
 
         Ok(())
     }
+
+    #[test]
+    fn test_parse_toml_partial() -> Result<()> {
+        let path = temp_file_path("partial");
+        let toml_content = r#"
+[ui]
+selected_background_color = "blue"
+
+[system]
+partial_navigation_fallback = true
+"#;
+        fs::write(&path, toml_content)?;
+
+        let config = parse_toml(&path)?;
+        let _ = fs::remove_file(path);
+
+        // 指定した値が反映されていること
+        assert_eq!(config.ui.selected_background_color, Color::Blue);
+        assert!(config.system.partial_navigation_fallback);
+
+        // 未指定の項目に正しくデフォルト値が割り当てられていること
+        assert_eq!(config.ui.selected_foreground_color, Color::Cyan);
+        assert_eq!(config.ui.path_foreground_color, Color::Cyan);
+        assert!(config.system.case_insensitive_search);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_parse_toml_only_ui_or_system() -> Result<()> {
+        // [ui] のみ指定、[system] 省略
+        let path1 = temp_file_path("only_ui");
+        fs::write(&path1, "[ui]\nselected_background_color = \"red\"\n")?;
+        let config1 = parse_toml(&path1)?;
+        let _ = fs::remove_file(path1);
+
+        assert_eq!(config1.ui.selected_background_color, Color::Red);
+        assert_eq!(config1.ui.selected_foreground_color, Color::Cyan);
+        assert_eq!(config1.system, SystemConfig::default());
+
+        // [system] のみ指定、[ui] 省略
+        let path2 = temp_file_path("only_system");
+        fs::write(&path2, "[system]\ncase_insensitive_search = false\n")?;
+        let config2 = parse_toml(&path2)?;
+        let _ = fs::remove_file(path2);
+
+        assert_eq!(config2.ui, UiConfig::default());
+        assert!(!config2.system.case_insensitive_search);
+        assert_eq!(config2.system.partial_navigation_fallback, false);
+
+        Ok(())
+    }
 }
