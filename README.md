@@ -87,7 +87,7 @@ function cdx() {
     local dest
     dest=$(command cdx "$@")
     if [ -n "$dest" ] && [ -d "$dest" ]; then
-        cd "$dest"
+        builtin cd "$dest"
     fi
 }
 ```
@@ -101,7 +101,7 @@ function cdx
     end
     set dest (command cdx $argv)
     if test -n "$dest" -a -d "$dest"
-        cd "$dest"
+        builtin cd "$dest"
     end
 end
 ```

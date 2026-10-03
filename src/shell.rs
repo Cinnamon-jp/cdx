@@ -58,7 +58,7 @@ pub fn get_init_script(shell: Shell) -> &'static str {
     local dest
     dest=$(command cdx "$@")
     if [ -n "$dest" ] && [ -d "$dest" ]; then
-        cd "$dest"
+        builtin cd "$dest"
     fi
 }
 "#
@@ -71,7 +71,7 @@ pub fn get_init_script(shell: Shell) -> &'static str {
     end
     set dest (command cdx $argv)
     if test -n "$dest" -a -d "$dest"
-        cd "$dest"
+        builtin cd "$dest"
     end
 end
 "#
@@ -116,7 +116,7 @@ mod tests {
         let script_bash = get_init_script(Shell::Bash);
         assert!(script_bash.contains("function cdx()"));
         assert!(script_bash.contains("command cdx \"$@\""));
-        assert!(script_bash.contains("cd \"$dest\""));
+        assert!(script_bash.contains("builtin cd \"$dest\""));
         assert!(script_bash.contains("[ \"$1\" = \"init\" ]"));
 
         let script_zsh = get_init_script(Shell::Zsh);
@@ -129,7 +129,7 @@ mod tests {
         let script_fish = get_init_script(Shell::Fish);
         assert!(script_fish.contains("function cdx"));
         assert!(script_fish.contains("command cdx $argv"));
-        assert!(script_fish.contains("cd \"$dest\""));
+        assert!(script_fish.contains("builtin cd \"$dest\""));
         assert!(script_fish.contains("\"$argv[1]\" = \"init\""));
         assert_eq!(get_init_script(Shell::Fish), script_fish);
     }
