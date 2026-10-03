@@ -1,0 +1,35 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*.*.*"
+
+jobs:
+    release:
+        name: Create GitHub Release
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Verify release notes exist
+              run: |
+                  TAG_NAME="${GITHUB_REF#refs/tags/}"
+                  NOTES_FILE="releases/${TAG_NAME}.md"
+                  if [ ! -f "$NOTES_FILE" ]; then
+                    echo "::error file=${NOTES_FILE}::Release notes file not found for ${TAG_NAME} at ${NOTES_FILE}!"
+                    exit 1
+                  fi
+
+            - name: Create GitHub Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  TAG_NAME="${GITHUB_REF#refs/tags/}"
+                  NOTES_FILE="releases/${TAG_NAME}.md"
+                  gh release create "$TAG_NAME" \
+                    --title "$TAG_NAME" \
+                    --notes-file "$NOTES_FILE"
