@@ -147,6 +147,7 @@ partial_navigation_fallback = true|false
 
 ## Planned Features
 
+- **Easy Home Directory Transition**: Initial focus on home directory (`~`) for seamless navigation to the home directory when running `cdx` and pressing Enter, matching standard `cd` behavior.
 - **Colorize Entries List**: Use distinct colors for directories, symbolic links, hidden entries, and other entry types to make the list easier to scan.
 - **Easy Installation**: Distribute pre-compiled binaries via package managers like Homebrew.
 - **Hidden & Gitignore Support**: Add toggles for hidden directories and respect `.gitignore` rules.
