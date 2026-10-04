@@ -307,7 +307,7 @@ partial_navigation_fallback = true
 
         assert_eq!(config2.ui, UiConfig::default());
         assert!(!config2.system.case_insensitive_search);
-        assert_eq!(config2.system.partial_navigation_fallback, false);
+        assert!(!config2.system.partial_navigation_fallback);
 
         Ok(())
     }
