@@ -11,6 +11,8 @@ mod ui;
 
 use std::{env, path, str::FromStr};
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let config = config::load_config_or_default();
@@ -28,6 +30,11 @@ fn main() {
         }
         // Non args -> TUI mode
         [] => run_tui(get_current_dir(), config),
+        // `--version` option
+        [opt] if opt == "--version" => {
+            println!("cdx v{}", VERSION);
+            std::process::exit(0);
+        }
         // One arg -> specific path (Direct or Fallback)
         [path_arg] => resolve_target_dir(path_arg, config).unwrap_or_else(|err| {
             eprintln!("Error: {}", err);
