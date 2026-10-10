@@ -1,7 +1,12 @@
-# cdx
+<div class="title-block" style="text-align: center;" align="center">
+
+# cdx—a interactive `cd` command alternative
+
+<p align="center"><img src="assets/cdx.png" alt="cdx image" width="300"></p>
 
 [![Crates.io](https://img.shields.io/crates/v/cdx-rs.svg)](https://crates.io/crates/cdx-rs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+</div>
 
 **cdx** (Accelerated cd) is a modern, simple and interactive `cd` command alternative for CLI lovers, written in Rust. It provides a fast and light TUI to incrementally search and navigate directories with ease.
 
