@@ -3,7 +3,6 @@
 // https://opensource.org/licenses/MIT
 
 use crossterm::style::Color;
-use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -61,10 +60,9 @@ pub fn load_config_or_default() -> Config {
         .unwrap_or_default()
 }
 
-/// 設定ファイルのパスを取得
+/// 設定ファイルのパスを取得 (~/.config/cdx/config.toml)
 pub fn get_config_path() -> Option<PathBuf> {
-    let proj_dirs = ProjectDirs::from("", "", "cdx")?;
-    Some(proj_dirs.config_dir().join("config.toml"))
+    Some(std::env::home_dir()?.join(".config/cdx/config.toml"))
 }
 
 /// 指定したパスのTOMLをパース
