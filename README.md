@@ -85,7 +85,7 @@ If you prefer to define the wrapper function manually without `eval`:
 **bash / zsh:**
 ```bash
 function cdx() {
-    if [ "$1" = "init" ]; then
+    if [ "$1" = "init" ] || [ "$1" = "--version" ]; then
         command cdx "$@"
         return
     fi
@@ -100,7 +100,7 @@ function cdx() {
 **fish:**
 ```fish
 function cdx
-    if test (count $argv) -gt 0 -a "$argv[1]" = "init"
+    if test (count $argv) -gt 0 -a \( "$argv[1]" = "init" -o "$argv[1]" = "--version" \)
         command cdx $argv
         return
     end

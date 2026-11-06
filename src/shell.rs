@@ -51,7 +51,7 @@ pub fn get_init_script(shell: Shell) -> &'static str {
     match shell {
         Shell::Bash | Shell::Zsh => {
             r#"function cdx() {
-    if [ "$1" = "init" ]; then
+    if [ "$1" = "init" ] || [ "$1" = "--version" ]; then
         command cdx "$@"
         return
     fi
@@ -65,7 +65,7 @@ pub fn get_init_script(shell: Shell) -> &'static str {
         }
         Shell::Fish => {
             r#"function cdx
-    if test (count $argv) -gt 0 -a "$argv[1]" = "init"
+    if test (count $argv) -gt 0 -a \( "$argv[1]" = "init" -o "$argv[1]" = "--version" \)
         command cdx $argv
         return
     end
@@ -117,7 +117,7 @@ mod tests {
         assert!(script_bash.contains("function cdx()"));
         assert!(script_bash.contains("command cdx \"$@\""));
         assert!(script_bash.contains("builtin cd \"$dest\""));
-        assert!(script_bash.contains("[ \"$1\" = \"init\" ]"));
+        assert!(script_bash.contains("[ \"$1\" = \"init\" ] || [ \"$1\" = \"--version\" ]"));
 
         let script_zsh = get_init_script(Shell::Zsh);
         assert_eq!(script_bash, script_zsh);
@@ -130,7 +130,7 @@ mod tests {
         assert!(script_fish.contains("function cdx"));
         assert!(script_fish.contains("command cdx $argv"));
         assert!(script_fish.contains("builtin cd \"$dest\""));
-        assert!(script_fish.contains("\"$argv[1]\" = \"init\""));
+        assert!(script_fish.contains("\"$argv[1]\" = \"init\" -o \"$argv[1]\" = \"--version\""));
         assert_eq!(get_init_script(Shell::Fish), script_fish);
     }
 }
