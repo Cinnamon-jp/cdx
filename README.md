@@ -158,6 +158,7 @@ partial_navigation_fallback = true|false
 - **Hidden & Gitignore Support**: Add toggles for hidden directories and respect `.gitignore` rules.
 - **Vim Keybindings**: Support `h`/`j`/`k`/`l` navigation for power users.
 - **Directory Bookmarks**: Save and jump to your favorite directories instantly.
+- **Unique Prefix Path Navigation**: Navigate directories by providing unique prefix abbreviations for each path segment (e.g., `cdx ~/.co/z` resolving and navigating to `~/.config/zed` when each prefix is unambiguous).
 
 ## License
 
